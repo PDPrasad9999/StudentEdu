@@ -1,10 +1,12 @@
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const path = require('path')
 const dotenv = require('dotenv')
 const { connectDB, getIsDbConnected } = require('./config/db')
 
-// Load environment variables
+// Load environment variables (from backend/.env or root .env or cloud environment)
+dotenv.config({ path: path.join(__dirname, '.env') })
 dotenv.config()
 
 const app = express()
@@ -23,6 +25,18 @@ app.use(express.urlencoded({ extended: true }))
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'))
 }
+
+// Ensure DB connection middleware (crucial for serverless environments)
+app.use(async (req, res, next) => {
+  if (!getIsDbConnected()) {
+    try {
+      await connectDB()
+    } catch (_) {
+      // Continue with mock store fallback
+    }
+  }
+  next()
+})
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -78,4 +92,10 @@ const startServer = (port) => {
   })
 }
 
-startServer(PORT)
+// In standalone CLI execution, start the listening server.
+// When imported as a module (e.g. by Vercel Serverless Function), export app.
+if (require.main === module) {
+  startServer(PORT)
+}
+
+module.exports = app

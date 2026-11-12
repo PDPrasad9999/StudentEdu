@@ -1,0 +1,20 @@
+{
+  "name": "smartedu",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SmartEdu - Smart Study Planner & Deadline Tracker",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "node backend/server.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "seed": "cd backend && node seed.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.6.2",
+    "morgan": "^1.10.0"
+  }
+}
