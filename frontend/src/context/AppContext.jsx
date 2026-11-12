@@ -95,6 +95,14 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     let isMounted = true
     const checkBackend = async () => {
+      // If deployed over HTTPS (e.g. Vercel) and no custom backend URL is configured, stay in local mode
+      const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:'
+      const hasCustomApi = Boolean(import.meta.env.VITE_API_URL)
+      if (isHttps && !hasCustomApi) {
+        if (isMounted) setBackendStatus('offline')
+        return
+      }
+
       try {
         const res = await UserAPI.getProfile()
         if (isMounted && res) {
